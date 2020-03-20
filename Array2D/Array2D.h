@@ -3,10 +3,11 @@
 #include <iomanip>
 #include <vector>
 
-#define UNMULT_ARRAYS 15
-#define UNEQUAL_ARRAYS 16
-#define UNMERGABLE_ARRAYS 17 
-#define NONINVERT_ARRAY 18
+#define UNMULT_MATRIX 15
+#define UNEQUAL_MATRIX 16
+#define UNMERGABLE_MATRIX 17 
+#define NONINVERT_MATRIX 18
+#define NONSQUARE_MATRIX 19
 
 enum MatrixInversionMethod
 {
@@ -87,6 +88,7 @@ public:
 	Array2D GetSubMatrix(unsigned int beginRow, unsigned int noOfRows, unsigned int beginColumn, unsigned int noOfColumns);
 	Array2D Transpose();	//Returns transpose of this object-array. While it made sense to overload operators for multiplication, addition and inversion, transposing doesn't have a C++ op that we can rationlize equivalence to.
 	Array2D Invert();
+	double Determinant();
 	bool SwapRows(unsigned int firstRow, unsigned int secondRow);
 	bool SwapColumns(int firstColumn, int secondColumn);	//TODO implement this
 
@@ -97,6 +99,7 @@ public:
 	static Array2D Identity(int dimension);	//simple function for quick construction of a identity matrix of size: dimension*dimension.
 	static bool AreOfSameSize(const Array2D &arr1, const Array2D &arr2);	//for m1*n1 and m2*n2 matrices, tests that m1 == m2 and n1 == n2.
 	static bool AreMultipliable(const Array2D &arr1, const Array2D &arr2);	//for m1*n1 and m2*n2 matrices, tests that n1 == m2.
+	static bool IsSquared(const Array2D &arr1); //For m*n matrix, tests that m = n.
 	static bool IsInvertible(Array2D arr);	//incomplete, for now tests that m = n for an n*m matrix.
 	static bool AreJoinable(const Array2D &arr1, const Array2D &arr2, bool testHorizontally = true);	//tests m1 == m2 or n1 == n2 depending on testHorizontally.
 	static Array2D MergeArrays(const Array2D &arr1, const Array2D &arr2);	//Stitches two arrays horizontally, both arrays must be of equal row count.
@@ -109,11 +112,15 @@ private:
 	Array2D InvertArray(const Array2D & sourceArr, MatrixInversionMethod method = MatrixInversionMethod::Gauss_Jordan);	//switch-statement based on method to use appropriate implementation. Now only Gauss_Jordan, more in future.
 	Array2D TransposeArray(const Array2D & sourceArr);
 
+	double CalculateDeterminant(const Array2D & sourceArr);
+
 	//matrix Inversion Methods
 	Array2D GausJordanElimination(const Array2D & sourceArr);
 
 	//private utilities (least privilage principle).
+	Array2D GetMinorSubMatrix(const Array2D & sourceArr, unsigned int _row, unsigned int _column);
 	void DeleteContent();
+	
 	
 	//array contents and parameters
 	double ** content;

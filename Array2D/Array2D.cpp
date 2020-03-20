@@ -253,6 +253,11 @@ Array2D Array2D::Invert()
 	return InvertArray(*this);
 }
 
+double Array2D::Determinant()
+{
+	return CalculateDeterminant(*this);
+}
+
 bool Array2D::SwapRows(unsigned int firstRow, unsigned int secondRow)
 {
 	//Check whether firstRow or secondRow are OOB, return fals if so.
@@ -285,7 +290,7 @@ bool Array2D::AreOfSameSize(const Array2D & arr1, const Array2D & arr2)
 {
 	if (arr1.Rows() != arr2.Rows() || arr1.Columns() != arr2.Columns())
 	{
-		throw UNEQUAL_ARRAYS;
+		throw UNEQUAL_MATRIX;
 		return false;
 	}
 	else
@@ -296,7 +301,18 @@ bool Array2D::AreMultipliable(const Array2D & arr1, const Array2D & arr2)
 {
 	if (arr1.Columns() != arr2.Rows())
 	{
-		throw UNMULT_ARRAYS;
+		throw UNMULT_MATRIX;
+		return false;
+	}
+	else
+		return true;
+}
+
+bool Array2D::IsSquared(const Array2D & arr1)
+{
+	if (arr1.Columns() != arr1.Rows())
+	{
+		throw NONSQUARE_MATRIX;
 		return false;
 	}
 	else
@@ -309,7 +325,7 @@ bool Array2D::IsInvertible(Array2D arr)
 
 	if (arr.Rows() != arr.Columns())
 	{
-		throw NONINVERT_ARRAY;
+		throw NONINVERT_MATRIX;
 		return false;
 	}
 	else
@@ -324,7 +340,7 @@ bool Array2D::AreJoinable(const Array2D & arr1, const Array2D & arr2, bool testH
 			return true;
 		else
 		{
-			throw UNMERGABLE_ARRAYS;
+			throw UNMERGABLE_MATRIX;
 			return false;
 		}
 	}
@@ -334,7 +350,7 @@ bool Array2D::AreJoinable(const Array2D & arr1, const Array2D & arr2, bool testH
 			return true;
 		else
 		{
-			throw UNMERGABLE_ARRAYS;
+			throw UNMERGABLE_MATRIX;
 			return false;
 		}
 	}
@@ -349,7 +365,7 @@ Array2D Array2D::MergeArrays(const Array2D & arr1, const Array2D & arr2)
 	catch (int exceptionInt)
 	{
 		std::cout << "Caught Exception: " << exceptionInt << std::endl;
-		if (exceptionInt == UNMERGABLE_ARRAYS)
+		if (exceptionInt == UNMERGABLE_MATRIX)
 		{
 			std::cout << "ERROR! Attempting to merge array of different heights" << std::endl;
 			return Array2D();
@@ -399,7 +415,7 @@ Array2D Array2D::MultiplyArrays(const Array2D & arr1, const Array2D & arr2)
 	catch (int exceptionInt)
 	{
 		std::cout << "Caught Exception: " << exceptionInt << std::endl;
-		if (exceptionInt == UNMULT_ARRAYS)
+		if (exceptionInt == UNMULT_MATRIX)
 		{
 			std::cout << "ERROR! Attempting to multiply array of " << arr1.Columns() << "columns with an array of " << arr2.Rows() << " rows." << std::endl;
 			return Array2D();  //really need to figure out how to make this thing more gracefull.
@@ -451,7 +467,7 @@ Array2D Array2D::AddArrays(const Array2D & arr1, const Array2D & arr2, int opSig
 	catch (int exceptionInt)
 	{
 		std::cout << "Caught Exception: " << exceptionInt << std::endl;
-		if (exceptionInt == UNEQUAL_ARRAYS)
+		if (exceptionInt == UNEQUAL_MATRIX)
 		{
 			std::cout << "ERROR! Attempting to add arrays of different sizes." << std::endl;
 			return Array2D();  
@@ -481,7 +497,7 @@ Array2D Array2D::InvertArray(const Array2D & sourceArr, MatrixInversionMethod me
 	catch (int exceptionInt)
 	{
 		std::cout << "Caught Exception: " << exceptionInt << std::endl;
-		if (exceptionInt == NONINVERT_ARRAY)
+		if (exceptionInt == NONINVERT_MATRIX)
 		{
 			std::cout << "ERROR! Attempting to invert a non-invertible array." << std::endl;
 			return Array2D();  
@@ -516,6 +532,41 @@ Array2D Array2D::TransposeArray(const Array2D & sourceArr)
 		{
 			result.SetValue(i, j, sourceArr.GetValue(j, i));
 		}
+	}
+
+	return result;
+}
+
+double Array2D::CalculateDeterminant(const Array2D & sourceArr) 
+{
+	//This recurive method calculate the determinant for a matrix of arbitrary dimensions. If the recieved matrix is less than 2x2, directly return the determinant, else will make use of
+	//the method GetMinorSubMatrix() and work recuresively untill reaching the 2x2 matrices. 
+	double result = 0.0f;
+
+	try
+	{
+		IsSquared(sourceArr);
+	}
+	catch (int exceptionInt)
+	{
+		std::cout << "Caught Exception: " << exceptionInt << std::endl;
+		if (exceptionInt == NONSQUARE_MATRIX)
+		{
+			std::cout << "ERROR! Attempting to calculate the determinant of a non-squared matrix." << std::endl;
+			return result;  //really need to figure out how to make this thing more gracefull.
+		}
+	}
+
+	if (sourceArr.Rows() > 2)
+	{
+		for (int i = 0; i < sourceArr.Rows(); i++)
+		{
+			result += pow(-1.0f, i) * sourceArr.GetValue(0, i) * CalculateDeterminant(GetMinorSubMatrix(sourceArr, 0, i));	//this is where the recurssion happens. The pow(-1.0f, i) term is used
+		}																													//to flip the sign of the addition based on which column we're at.
+	}
+	else
+	{
+		result = (sourceArr.GetValue(0, 0) * sourceArr.GetValue(1, 1)) - (sourceArr.GetValue(1, 0) * sourceArr.GetValue(0, 1));
 	}
 
 	return result;
@@ -558,6 +609,31 @@ Array2D Array2D::GausJordanElimination(const Array2D & sourceArr)
 
 	//extract result from augmentedArr
 	result = augmentedArr.GetSubMatrix(0, result.Rows(), sourceArr.Columns(), result.Columns());
+
+	return result;
+}
+
+Array2D Array2D::GetMinorSubMatrix(const Array2D & sourceArr, unsigned int _row, unsigned int _column)
+{
+	//The ij-minor sub-matrix is obtained by deleting the ith row and jth column of a matrix.
+
+	Array2D result(sourceArr.Rows() - 1, sourceArr.Columns() - 1);
+
+	for (int i = 0; i < result.Rows(); i++) //this loop iterates on the smaller, sub matrix. We maintain seperate indeces inside for use when reading from source matrix.
+	{
+		int rowInSourceArr = i;
+		if (i >= _row) //This means we've reached the row we want to ommit, so now we read the next row.
+			rowInSourceArr += 1;
+
+		for (int j = 0; j < result.Columns(); j++)
+		{
+			int columnInSourceArr = j;
+			if (j >= _column) //This means we've reached the column we want to ommit, so now we read the next column.
+				columnInSourceArr += 1;
+
+			result.SetValue(i, j, sourceArr.GetValue(rowInSourceArr, columnInSourceArr));
+		}
+	}
 
 	return result;
 }
