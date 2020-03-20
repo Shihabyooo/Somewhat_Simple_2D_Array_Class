@@ -94,7 +94,7 @@ public:
 	void DisplayArrayInCLI(int displayPrecision = 4);
 
 	//Static methods
-	static Array2D Unity(int dimension);	//simple function for quick construction of a unity matrix of size: dimension*dimension.
+	static Array2D Identity(int dimension);	//simple function for quick construction of a identity matrix of size: dimension*dimension.
 	static bool AreOfSameSize(const Array2D &arr1, const Array2D &arr2);	//for m1*n1 and m2*n2 matrices, tests that m1 == m2 and n1 == n2.
 	static bool AreMultipliable(const Array2D &arr1, const Array2D &arr2);	//for m1*n1 and m2*n2 matrices, tests that n1 == m2.
 	static bool IsInvertible(Array2D arr);	//incomplete, for now tests that m = n for an n*m matrix.

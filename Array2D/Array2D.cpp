@@ -271,7 +271,7 @@ bool Array2D::SwapRows(unsigned int firstRow, unsigned int secondRow)
 	return true;
 }
 
-Array2D Array2D::Unity(int dimension)
+Array2D Array2D::Identity(int dimension)
 {
 	Array2D uMatrix(dimension, dimension);
 	
@@ -524,7 +524,7 @@ Array2D Array2D::TransposeArray(const Array2D & sourceArr)
 Array2D Array2D::GausJordanElimination(const Array2D & sourceArr)
 {
 	Array2D result(sourceArr.Rows(), sourceArr.Columns());
-	Array2D augmentedArr = MergeArrays(sourceArr, Unity(sourceArr.Rows())); //augmentedArr is the augment matrix, which is the original matrix with a unity array attached to its right.
+	Array2D augmentedArr = MergeArrays(sourceArr, Identity(sourceArr.Rows())); //augmentedArr is the augment matrix, which is the original matrix with a identity matrix attached to its right.
 
 	//TODO Swapping rows when the first pivot value is zero
 

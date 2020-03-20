@@ -9,9 +9,9 @@ void main(int argc, char * argv)
 	std::cout << "Test begin\n";
 
 	std::cout << "\n=========================================================================" << std::endl;
-	std::cout << "Testing creating a 5x5 unity matrix: " << std::endl;
-	Array2D unityMat = Array2D::Unity(5);
-	unityMat.DisplayArrayInCLI();
+	std::cout << "Testing creating a 5x5 identity matrix: " << std::endl;
+	Array2D identityMat = Array2D::Identity(5);
+	identityMat.DisplayArrayInCLI();
 
 	std::cout << "\n=========================================================================" << std::endl;
 	std::cout << "Testing creating a 3x3 matrix and setting values through Array2D.SetValue(): " << std::endl;
@@ -33,7 +33,7 @@ void main(int argc, char * argv)
 	arr1Inv_2.DisplayArrayInCLI();
 
 	std::cout << "\n=========================================================================" << std::endl;
-	std::cout << "Testing array multiplication, multiplying the 3x3 array above with its inverse (result should be 3x3 unity matrix):" << std::endl;
+	std::cout << "Testing array multiplication, multiplying the 3x3 array above with its inverse (result should be 3x3 identity matrix):" << std::endl;
 	Array2D arr1Mult = arr1 * arr1Inv;
 	arr1Mult.DisplayArrayInCLI();
 
