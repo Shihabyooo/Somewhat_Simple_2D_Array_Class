@@ -22,33 +22,6 @@ Array2D::Array2D()
 
 Array2D::Array2D(const Array2D & sourceArr)
 {
-	////std::cout << "Copy_Constructor_called @ " << this <<"from source " << &sourceArr << std::endl;
-	////std::cout << " Setting rows and columns" << std::endl;
-	//rows = sourceArr.Rows();
-	//columns = sourceArr.Columns();
-	////std::cout << "Testing source content for NULL" << std::endl;
-	//if (sourceArr.content == NULL)
-	//{
-	//	std::cout << "WARNING! Attempting to copy an Array2D with unintialized content.\n"; //test
-	//	content = NULL;
-	//	return;
-	//}
-	////std::cout << "initializing and copying contents" << std::endl;
-	////content = new double*[rows];
-	////for (int i = 0; i < rows; i++)
-	////	content[i] = new double[columns];
-	////*content = *sourceArr.content;
-	//content = new double*[rows];
-	//for (int i = 0; i < rows; i++)
-	//{
-	//	content[i] = new double[columns];
-	//	for (int j = 0; j < columns; j++)
-	//	{
-	//		content[i][j] = sourceArr.GetValue(i, j);
-	//	}
-	//}
-	////std::cout << "end of Copy_Constructor @ " << this << std::endl;
-
 	content = NULL;
 	*this = sourceArr;
 }
@@ -650,6 +623,7 @@ void Array2D::DeleteContent()
 			}
 		}
 		delete[] content;
+		content = NULL;
 	}
 	columns = 0;
 	rows = 0;
