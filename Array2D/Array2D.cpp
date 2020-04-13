@@ -249,6 +249,25 @@ bool Array2D::SwapRows(unsigned int firstRow, unsigned int secondRow)
 	return true;
 }
 
+void Array2D::Overlay(const Array2D & arr2, int rowOffset, int columnOffset)
+{
+	if (content == NULL) //if this Array2D is uninitialized, this method acts as a simple assignment.
+	{
+		*this = arr2;
+	}
+
+
+	int _rows = rows > arr2.Rows() + rowOffset ? arr2.Rows() + rowOffset : rows;
+	int _columns = columns > arr2.Columns() + columnOffset ? arr2.Columns() + columnOffset : columns;
+
+	for (int i = rowOffset; i < _rows; i++)
+	{
+		for (int j = columnOffset; j < _columns; j++)
+			content[i][j] += arr2.GetValue(i - rowOffset, j - columnOffset);
+	}
+
+}
+
 Array2D Array2D::Identity(int dimension)
 {
 	Array2D uMatrix(dimension, dimension);

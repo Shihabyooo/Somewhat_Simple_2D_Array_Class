@@ -71,6 +71,18 @@ void main(int argc, char * argv)
 
 	std::cout << "\nThe determinant is: " << arr3.Determinant() << std::endl;
 
+	std::cout << "\n=========================================================================" << std::endl;
+	std::cout << "Testing overlaying of unequal sized arrays:" << std::endl;
+	Array2D arr4(4, 4);
+	std::cout << "Overlaying a 2x2 identity matrix with 0, 0 offsets:" << std::endl;
+	arr4.Overlay(Array2D::Identity(2), 0, 0);
+	arr4.DisplayArrayInCLI();
+	
+	std::cout << "Overlaying arr3 (the one used to test determinant) with 0, 1 offsets:" << std::endl;
+	arr4.Overlay(arr3, 0, 1);
+	arr4.DisplayArrayInCLI();
+
+
 	std::cout << "Test end\n";
 #pragma endregion
 
