@@ -68,7 +68,6 @@ void Array2D::operator=(const Array2D & sourceArr)
 	//In this implementation, we accept that we could assign an "empty" object to this one. We set content = NULL because that's how we establish this object to be empty.
 	if (sourceArr.content == NULL)
 	{
-		//std::cout << "WARNING! Attempting to copy an Array2D with unintialized content.\n"; //test
 		content = NULL;
 		return;
 	}
@@ -439,7 +438,7 @@ Array2D Array2D::InvertArray(const Array2D & sourceArr, MatrixInversionMethod me
 	
 	switch (method)
 	{
-	case Gauss_Jordan:
+	case MatrixInversionMethod::Gauss_Jordan:
 		return GausJordanElimination(sourceArr);
 	default:
 		std::cout << "ERROR! Received unsupported MatrixInversionMethod in InverArray()." << std::endl; //shouldn't happen (but still...)

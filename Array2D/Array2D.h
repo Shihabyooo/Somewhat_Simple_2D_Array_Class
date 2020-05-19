@@ -4,14 +4,10 @@
 #include <vector>
 #include <stdexcept>
 
-//#define UNMULT_MATRIX 15
-//#define UNEQUAL_MATRIX 16
-//#define UNMERGABLE_MATRIX 17 
-//#define NONINVERT_MATRIX 18
-//#define NONSQUARE_MATRIX 19
+//TODO consider having a #define or a typedef at the begining of this header, and switch all instances of size_t to this macro/alias. This would make it easier later for implementers to select
+//whether they want to use the large but slow size_t vs the smaller but faster unsigned int/unsigned long int.
 
-
-enum MatrixInversionMethod
+enum class MatrixInversionMethod
 {
 	Gauss_Jordan, //Gaus-Jordan elimination
 	//TODO implement more techniques
@@ -41,11 +37,6 @@ private:
 			//Array1D does not own its content, its merely a pointer to a row of the double ** content in Array2D. Deleting Array1D's content means deleting respective row in Array2D's content.
 			//leaving this as an empty destructor to prevent default compiler destructors.
 		};
-
-		/*void operator= (double * arrayRow)
-		{
-			content = arrayRow;
-		};*/
 
 		double & operator[] (size_t _column)
 		{

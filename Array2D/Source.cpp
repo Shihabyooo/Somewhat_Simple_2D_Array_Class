@@ -61,7 +61,7 @@ int main(int argc, char * argv)
 	{
 		arr2[i][0] = i + (double)i / 2.0f;
 		arr2[i][1] = i + 2.0f;
-	}
+	}	
 
 	std::cout << "====== Reading values using: [][]:" << std::endl;
 	for (int i = 0; i < 2; i++)
