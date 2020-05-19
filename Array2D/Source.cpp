@@ -3,7 +3,7 @@
 //#include <vector>
 #include "Array2D.h"
 
-void main(int argc, char * argv)
+int main(int argc, char * argv)
 {
 #pragma region testing the Array2D class
 	std::cout << "Test begin\n";
@@ -20,6 +20,17 @@ void main(int argc, char * argv)
 	arr1.SetValue(1, 0, 3.5f);		arr1.SetValue(1, 1, 5.76f);		arr1.SetValue(1, 2, 22.2f);
 	arr1.SetValue(2, 0, 10.0f);		arr1.SetValue(2, 1, 0.05f);		arr1.SetValue(2, 2, 576.6f);
 	arr1.DisplayArrayInCLI();
+
+	std::cout << "\n=========================================================================" << std::endl;
+	std::cout << "Testing Out-of-bounds access safety: " << std::endl;
+	try
+	{
+		arr1[5][5] = 0.0; 
+	}
+	catch (const std::exception &exp)
+	{
+		std::cout << "Caught exceptions with message: " << exp.what() << std::endl;
+	}
 
 	std::cout << "\n=========================================================================" << std::endl;
 	std::cout << "Testing array inversion through Array2D.Invert(): " << std::endl;
@@ -51,6 +62,7 @@ void main(int argc, char * argv)
 		arr2[i][0] = i + (double)i / 2.0f;
 		arr2[i][1] = i + 2.0f;
 	}
+
 	std::cout << "====== Reading values using: [][]:" << std::endl;
 	for (int i = 0; i < 2; i++)
 	{
@@ -89,4 +101,6 @@ void main(int argc, char * argv)
 	std::cout << "Press any key to continue." << std::endl;
 	std::cin.sync();
 	std::cin.get();
+
+	return 0;
 }
