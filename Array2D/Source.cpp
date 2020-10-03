@@ -1,7 +1,10 @@
 #include <iostream>
 //#include <math.h>
 //#include <vector>
+#include <chrono>
+
 #include "Array2D.h"
+
 
 int main(int argc, char * argv)
 {
@@ -93,6 +96,39 @@ int main(int argc, char * argv)
 	std::cout << "Overlaying arr3 (the one used to test determinant) with 0, 1 offsets:" << std::endl;
 	arr4.Overlay(arr3, 0, 1);
 	arr4.DisplayArrayInCLI();
+
+	std::cout << "\n=========================================================================" << std::endl;
+
+	for (int size = 1; size <= 1000000; size = size * 10)
+	{
+		std::cout << "Testing init speed between normal and fast constructors for a " << size << "x" << size << " array:" << std::endl;
+		std::chrono::high_resolution_clock::time_point startTime;
+		std::chrono::microseconds durSlow, durFast;
+		try
+		{
+			startTime = std::chrono::high_resolution_clock::now();
+			Array2D bigArraySlow(size, size);
+			durSlow = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - startTime);
+
+			startTime = std::chrono::high_resolution_clock::now();
+			Array2D bigArrayFast(size, size, nullptr);
+			durFast = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - startTime);
+		}
+		catch (std::bad_alloc &exception)
+		{
+			std::cout << "Could not allocate this array. Too big? "
+					<< pow(static_cast<double>(size), 2.0f) * sizeof(double) / 1024.0F / 1024.0F / 1024.0F << "GB."
+					<< std::endl << std::endl;
+			continue;
+		}
+
+		std::cout << "Slow init time: " << durSlow.count() << " microsecond." << std::endl;
+		std::cout << "Fast init time: " << durFast.count() << " microsecond." << std::endl;
+		std::cout << "Delta: " << durSlow.count() - durFast.count() << " microsecond. Or: "
+			<< 100.0F * static_cast<double>(durSlow.count() - durFast.count()) / static_cast<double>(durSlow.count())
+			<< "% faster" << std::endl;
+		std::cout << std::endl;
+	}
 
 
 	std::cout << "Test end\n";
