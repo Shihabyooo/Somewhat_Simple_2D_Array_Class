@@ -4,6 +4,15 @@
 #include <vector>
 #include <stdexcept>
 
+#define Alloc(x, y) try\
+	{\
+	AllocateMemory(x, y);\
+	}\
+	catch (const std::bad_alloc& exception)\
+	{\
+		throw exception;\
+	}
+
 //TODO consider having a #define or a typedef at the begining of this header, and switch all instances of size_t to this macro/alias. This would make it easier later for implementers to select
 //whether they want to use the large but slow size_t vs the smaller but faster unsigned int/unsigned long int.
 
@@ -53,8 +62,10 @@ private:
 
 public:
 	//constructors and destructors
-	Array2D(size_t _rows, size_t _columns);
 	Array2D();
+	Array2D(size_t _rows, size_t _columns);
+	Array2D(size_t _rows, size_t _columns, std::nullptr_t flag); //A "Fast" init. The nullptr is just a dirty way to differentiate it from the normal init
+	Array2D(size_t _rows, size_t _columns, double defaultValue);
 	Array2D(const Array2D & sourceArr); //copy constructor
 	Array2D(std::vector<std::vector<double>> & sourceVec); //copy constructor from a vector of vectors of doubles, assumes unequal sub-vectors, allocates for largest one and pads the others with zeroes.
 	~Array2D();
@@ -121,6 +132,7 @@ private:
 	Array2D GausJordanElimination(const Array2D & sourceArr);
 
 	//private utilities (least privilage principle).
+	void AllocateMemory(size_t _rows, size_t _columns);
 	Array2D GetMinorSubMatrix(const Array2D & sourceArr, size_t _row, size_t _column);
 	void DeleteContent();
 	

@@ -1,23 +1,38 @@
 #include "Array2D.h"
 
-Array2D::Array2D(size_t _rows, size_t _columns)
-{
-	content = new double*[_rows];
-	for (size_t i = 0; i < _rows; i++)
-	{
-		content[i] = new double[_columns];
-	}
-
-	columns = _columns;
-	rows = _rows;
-	SetEntireArrayToFixedValue(0);
-}
-
 Array2D::Array2D()
 {
 	rows = 0;
 	columns = 0;
 	content = NULL;
+}
+
+Array2D::Array2D(size_t _rows, size_t _columns)
+{
+	Alloc(_rows, _columns);
+
+	columns = _columns;
+	rows = _rows;
+	SetEntireArrayToFixedValue(0.0f);
+}
+
+Array2D::Array2D(size_t _rows, size_t _columns, std::nullptr_t flag)
+{
+	Alloc(_rows, _columns);
+
+	columns = _columns;
+	rows = _rows;
+}
+
+Array2D::Array2D(size_t _rows, size_t _columns, double defaultValue)
+{
+	//Array2D(_rows, _columns);
+	Alloc(_rows, _columns);
+
+	columns = _columns;
+	rows = _rows;
+
+	SetEntireArrayToFixedValue(defaultValue);
 }
 
 Array2D::Array2D(const Array2D & sourceArr)
@@ -72,16 +87,11 @@ void Array2D::operator=(const Array2D & sourceArr)
 		return;
 	}
 
-	content = new double*[rows];
-	for (size_t i = 0; i < rows; i++)
-	{
-		content[i] = new double[columns];
+	Alloc(rows, columns);
 
+	for (size_t i = 0; i < rows; i++)
 		for (size_t j = 0; j < columns; j++)
-		{
 			content[i][j] = sourceArr.GetValue(i, j);
-		}
-	}
 }
 
 void Array2D::operator=(std::vector<std::vector<double>>& sourceVec)
@@ -116,11 +126,7 @@ void Array2D::operator=(std::vector<std::vector<double>>& sourceVec)
 		return;
 	}
 
-	content = new double *[rows];
-	for (size_t i = 0; i < rows; i++)
-		content[i] = new double[columns];
-
-	SetEntireArrayToFixedValue(0.0f);
+	Alloc(rows, columns);
 
 	size_t currentRow = 0, currentColumn = 0;
 
@@ -535,6 +541,27 @@ Array2D Array2D::GausJordanElimination(const Array2D & sourceArr)
 	return result;
 }
 
+void Array2D::AllocateMemory(size_t _rows, size_t _columns)
+{
+	try
+	{
+		content = new double*[_rows];
+		double * helperPtr = new double[_rows * _columns];
+
+		for (size_t i = 0; i < _rows; i++)
+		{
+			content[i] = helperPtr;
+			helperPtr += _columns;
+		}
+
+	}
+	catch (const std::bad_alloc& exception)
+	{
+		std::cout << "ERROR! Could not allocate array. " << exception.what() << std::endl;
+		throw exception;
+	}
+}
+
 Array2D Array2D::GetMinorSubMatrix(const Array2D & sourceArr, size_t _row, size_t _column)
 {
 	//The ij-minor sub-matrix is obtained by deleting the ith row and jth column of a matrix.
@@ -564,13 +591,16 @@ void Array2D::DeleteContent()
 {
 	if (content != NULL)
 	{
-		for (size_t i = 0; i < rows; i++)
+		/*for (size_t i = 0; i < rows; i++)
 		{
 			if (content[i] != NULL)
 			{
 				delete content[i];
 			}
-		}
+		}*/
+		if (content[0] != NULL)
+			delete[] content[0];
+
 		delete[] content;
 		content = NULL;
 	}
