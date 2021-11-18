@@ -1,3 +1,10 @@
+/*Shihab E. 2021.
+A C++ class (Header + .cpp file) defining an Array2D type to work-around C++'s weakness with dynamic matrices/arrays.
+Comes with some maths operators overloaded for some basic matrix operations (multiplication, additions, transposing, inversion) plus other helper methods.
+
+Tested with Visual Studio Community 2017 on Windows 10 (1903 and 20H1).
+Note: For some reason, compilation fails in Visual Studio when set to debug mode, but works flawlessly in release mode.*/
+
 #pragma once
 #include <iostream>
 #include <iomanip>
@@ -12,6 +19,8 @@
 	{\
 		throw exception;\
 	}
+
+#define MINDET 0.001F //The value bellow which the absolute of the determinant is considered zero (i.e. matrix would be considered singular)
 
 //TODO consider having a #define or a typedef at the begining of this header, and switch all instances of size_t to this macro/alias. This would make it easier later for implementers to select
 //whether they want to use the large but slow size_t vs the smaller but faster unsigned int/unsigned long int.
@@ -114,7 +123,7 @@ public:
 	static bool AreOfSameSize(const Array2D &arr1, const Array2D &arr2);	//for m1*n1 and m2*n2 matrices, tests that m1 == m2 and n1 == n2.
 	static bool AreMultipliable(const Array2D &arr1, const Array2D &arr2);	//for m1*n1 and m2*n2 matrices, tests that n1 == m2.
 	static bool IsSquared(const Array2D &arr1); //For m*n matrix, tests that m = n.
-	static bool IsInvertible(Array2D arr);	//incomplete, for now tests that m = n for an n*m matrix.
+	static bool IsInvertible(Array2D arr, bool checkSingular = false);	//Computing the determinant can take ages with current algorithm for large matrices, so the singularity check is optional.
 	static bool AreJoinable(const Array2D &arr1, const Array2D &arr2, bool testHorizontally = true);	//tests m1 == m2 or n1 == n2 depending on testHorizontally.
 	static Array2D MergeArrays(const Array2D &arr1, const Array2D &arr2);	//Stitches two arrays horizontally, both arrays must be of equal row count.
 

@@ -297,11 +297,12 @@ bool Array2D::IsSquared(const Array2D & arr1)
 		return true;
 }
 
-bool Array2D::IsInvertible(Array2D arr)
+bool Array2D::IsInvertible(Array2D arr, bool checkSingular)
 {
-	//TODO implement singular/degenerate array checks here
-
 	if (arr.Rows() != arr.Columns())
+		return false;
+	else if (checkSingular && abs(arr.Determinant()) <= MINDET) //Making use of the optimization where determinant computation wil be skipped if checkSingular is false
+																//TODO check whether this is a standard and always the case, or is compiler/language version specific.
 		return false;
 	else
 		return true;
@@ -505,7 +506,24 @@ Array2D Array2D::GausJordanElimination(const Array2D & sourceArr)
 	Array2D result(sourceArr.Rows(), sourceArr.Columns());
 	Array2D augmentedArr = MergeArrays(sourceArr, Identity(sourceArr.Rows())); //augmentedArr is the augment matrix, which is the original matrix with a identity matrix attached to its right.
 
-	//TODO Swapping rows when the first pivot value is zero
+	//If first pivot value is zero, must swap the row with another that has a non-zero value. If none exist, can't use this method.
+	if (augmentedArr.GetValue(0, 0) == 0.0f)
+	{
+		//look for a row where first element is not zero
+		for (int i = 0; i < augmentedArr.Rows(); i++)
+		{
+			if (augmentedArr.GetValue(i, 0) != 0.0f)
+			{
+				augmentedArr.SwapRows(0, i);
+				break;
+			}
+			if (i == augmentedArr.Rows())
+			{
+				std::cout << "ERROR! Could not find a suitable pivot value for first row. Can't invert useing Gauss-Jordan Elimmination" << std::endl;
+				return Array2D();
+			}
+		}
+	}
 
 	//For an array of n*n size, n steps are needed to get the inverse.
 	for (size_t step = 0; step < result.Rows(); step++) //the variable "step" here will be our pivot row, and by virtue of being a squared array, our pivot column as well.
@@ -530,6 +548,7 @@ Array2D Array2D::GausJordanElimination(const Array2D & sourceArr)
 					double newValueAtOtherRow = augmentedArr.GetValue(i, j) - (mFactors[i] * newColumnValueAtPivotRow);
 					augmentedArr.SetValue(i, j, newValueAtOtherRow);
 				}
+				//augmentedArr.DisplayArrayInCLI();
 			}
 		}
 		delete[] mFactors;
