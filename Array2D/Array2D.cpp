@@ -260,7 +260,16 @@ void Array2D::Overlay(const Array2D & arr2, size_t rowOffset, size_t columnOffse
 		for (size_t j = columnOffset; j < _columns; j++)
 			content[i][j] += arr2.GetValue(i - rowOffset, j - columnOffset);
 	}
+}
 
+Array2D ** Array2D::DecomposeLU()
+{
+	return DecomposeLU(*this);
+}
+
+Array2D ** Array2D::DecomposeLUP()
+{
+	return DecomposeLUP(*this);
 }
 
 Array2D Array2D::Identity(size_t dimension)
@@ -347,6 +356,72 @@ Array2D Array2D::MergeArrays(const Array2D & arr1, const Array2D & arr2)
 	}
 
 	return result;
+}
+
+Array2D ** Array2D::DecomposeLU(const Array2D & arr)
+{
+	//Based on the algorithm detailed on Introduction to Algorithms (3rd ed), Cormen, T., Lieserson, C., Rivest, R., and Stein, C.
+
+	if (!IsSquared(arr))
+	{
+		std::cout << "ERROR! Cannot decompose a non-squared matrix." << std::endl;
+		return NULL;
+	}
+
+	Array2D ** decomposition = new Array2D * [2]; //first is lower, second is upper.
+
+	Array2D * lower = decomposition[0] = new Array2D(arr.Rows(), arr.Rows());
+	Array2D * upper = decomposition[1] = new Array2D(arr.Rows(), arr.Rows());
+	
+	//we need a temporary matrix initially holding the same content of original matrix for the computations bellow
+	Array2D * tempMatrix = new Array2D(arr);
+
+	for (int i = 0; i < arr.Rows(); i++)
+	{
+		//upper diagonal is same for original matrix
+		upper->SetValue(i, i, tempMatrix->GetValue(i, i));
+
+		//lower diagonal = 1
+		lower->SetValue(i, i, 1.0f);
+
+		for (int j = i + 1; j < arr.Rows(); j++)
+		{
+			//lower is divided by upper's pivot
+			lower->SetValue(j, i, tempMatrix->GetValue(j, i) / upper->GetValue(i, i));
+
+			//upper triangle (above diagonal) is the Schur compliment
+			upper->SetValue(i, j, tempMatrix->GetValue(i, j));
+		}
+
+		//compute the Schur complement in-place in the temporary matrix
+		for (int k = i + 1; k < arr.Rows(); k++)
+		{
+			for (int l = i + 1; l < arr.Rows(); l++)
+			{
+				tempMatrix->SetValue(k, l, tempMatrix->GetValue(k, l) - lower->GetValue(k, i) * upper->GetValue(i, l));
+			}
+		}
+	}
+
+	//cleanup and return
+	delete tempMatrix;
+
+	return decomposition;
+}
+
+Array2D ** Array2D::DecomposeLUP(const Array2D & arr) //TODO finish implementing this
+{
+	//Based on the algorithm detailed on Introduction to Algorithms (3rd ed), Cormen, T., Lieserson, C., Rivest, R., and Stein, C.
+
+	if (!IsSquared(arr))
+	{
+		std::cout << "ERROR! Cannot decompose a non-squared matrix." << std::endl;
+		return NULL;
+	}
+
+	Array2D ** decomposition = new Array2D * [3]; //first is lower, second is upper, third is permutation
+
+	return decomposition;
 }
 
 void Array2D::DisplayArrayInCLI(int displayPrecision)
