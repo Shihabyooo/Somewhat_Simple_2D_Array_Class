@@ -130,6 +130,37 @@ int main(int argc, char * argv)
 		std::cout << std::endl;
 	}
 
+	std::cout << "\n=========================================================================" << std::endl;
+	std::cout << "Testing LU decomposition of the following array:" << std::endl;
+	Array2D arr5(5, 5);
+	arr5.SetValue(0, 0, 2.55f);		arr5.SetValue(0, 1, 0.2f);		arr5.SetValue(0, 2, 85.5f);		arr5.SetValue(0, 3, 1.25f);		arr5.SetValue(0, 4, 85.5f);
+	arr5.SetValue(1, 0, 3.5f);		arr5.SetValue(1, 1, 3.58f);		arr5.SetValue(1, 2, 22.2f);		arr5.SetValue(1, 3, 3.5f);		arr5.SetValue(1, 4, 3.5f);
+	arr5.SetValue(2, 0, 1.05f);		arr5.SetValue(2, 1, 0.05f);		arr5.SetValue(2, 2, 2.5f);	arr5.SetValue(2, 3, 3.5f);		arr5.SetValue(2, 4, 1.5f);
+	arr5.SetValue(3, 0, 3.7f);		arr5.SetValue(3, 1, 55.0f);		arr5.SetValue(3, 2, 22.2f);		arr5.SetValue(3, 3, 3.5f);		arr5.SetValue(3, 4, 3.5f);
+	arr5.SetValue(4, 0, 2.2f);		arr5.SetValue(4, 1, 2.0f);		arr5.SetValue(4, 2, 2.0f);		arr5.SetValue(4, 3, 3.5f);		arr5.SetValue(4, 4, 5.0f);
+	arr5.DisplayArrayInCLI();
+
+	Array2D ** decomposition = arr5.DecomposeLU();
+	if (decomposition != NULL)
+	{
+		std::cout << "Lower decomposition" << std::endl;
+		decomposition[0]->DisplayArrayInCLI();
+
+		std::cout << "Upper decomposition" << std::endl;
+		decomposition[1]->DisplayArrayInCLI();
+
+		std::cout << "Multipliciation of the decomposition subtracted from the original (should be a matrix of zeroes, since A = L * U)" << std::endl;
+		Array2D luTest = (*decomposition[0] * *decomposition[1]) - arr5;
+		luTest.DisplayArrayInCLI(2);
+
+		delete decomposition[0];
+		delete decomposition[1];
+		delete[] decomposition;
+	}
+	else
+	{
+		std::cout << "Could not decompose the provided matrix" << std::endl;
+	}
 
 	std::cout << "Test end\n";
 #pragma endregion
