@@ -87,6 +87,77 @@ int main(int argc, char * argv)
 	std::cout << "\nThe determinant is: " << arr3.Determinant() << std::endl;
 
 	std::cout << "\n=========================================================================" << std::endl;
+	std::cout << "Testing equality:" << std::endl;
+	std::cout << "===== Between the determenant test array and itself:  ";// << std::endl;
+	if (arr3 == arr3)
+		std::cout << "They are equall!" << std::endl;
+	else
+		std::cout << "!!!!!!! Something is wrong" << std::endl;
+
+	std::cout << "===== Between the det-test array and itself after multiplication with 100:  ";// << std::endl;
+	if (arr3 == (arr3 * 100.0f))
+		std::cout << "!!!!!!! Something is wrong" << std::endl;
+	else
+		std::cout << "They are not equall" << std::endl;
+
+
+	std::cout << "===== Between the det-test array and a part of itself (quarter) (testing != overload):  ";// << std::endl;
+	if (arr3 != arr3.GetSubMatrix(0, 2, 0, 2))
+		std::cout << "They are not equall!" << std::endl;
+	else
+		std::cout << "!!!!!!! Something is wrong" << std::endl;
+
+	std::cout << "===== Between the det-test array and itself after multiplication with 1.001:  ";// << std::endl;
+	if (arr3 == (arr3 * 1.01f))
+		std::cout << "!!!!!!! Something is wrong" << std::endl;
+	else
+		std::cout << "They are not equall" << std::endl;
+
+	std::cout << "\nTesting near-equality (nearly equal to):" << std::endl;
+	std::cout << "===== Between the det-test array and itself after adding it to an equall sized array with all elements of 0.01f, with tolerance of 0.015:  ";// << std::endl;
+	if (arr3.NearlyEquals((arr3 + Array2D(4, 4, 0.01f)), 0.015f))
+		std::cout << "They are nearly equall!" << std::endl;
+	else
+		std::cout << "!!!!!!! Something is wrong" << std::endl;
+
+	std::cout << "\n=========================================================================" << std::endl;
+	std::cout << "Testing symmetry:" << std::endl;
+	std::cout << "Of the det-test array:  ";// << std::endl;
+	if (!arr3.IsSymmetric())
+		std::cout << "Nope! Not symmetric." << std::endl;
+	else
+		std::cout << "!!!!!!! Something is wrong" << std::endl;
+
+	std::cout << "Of the 5x5 identity array added to a 5x5 array of fixed value 10.0:  ";// << std::endl;
+	Array2D arrSymTest = Array2D::Identity(5) + Array2D(5, 5, 10.0f);
+
+	if (arrSymTest.IsSymmetric())
+		std::cout << "Yes! It's symmetric." << std::endl;
+	else
+		std::cout << "!!!!!!! Something is wrong" << std::endl;
+
+	std::cout << "Of the previous array after adding 0.01f to the bottom triangle only:  ";// << std::endl;
+	Array2D arrSymTest2 = arrSymTest;
+	for (int i = 1; i < 5; i++)
+	{
+		for (int j = 0; j < i; j++)
+		{
+			arrSymTest2[i][j] += 0.01f;
+		}
+	}
+
+	if (!arrSymTest2.IsSymmetric())
+		std::cout << "Nope! It's not symmetric." << std::endl;
+	else
+		std::cout << "!!!!!!! Something is wrong" << std::endl;
+
+	std::cout << "Redoing with previous test with near-symmetry check and 0.015 tolerace:  ";// << std::endl;
+	if (arrSymTest2.IsSymmetric(0.015f))
+		std::cout << "Yes! It's symmetric." << std::endl;
+	else
+		std::cout << "!!!!!!! Something is wrong" << std::endl;
+
+	std::cout << "\n=========================================================================" << std::endl;
 	std::cout << "Testing overlaying of unequal sized arrays:" << std::endl;
 	Array2D arr4(4, 4);
 	std::cout << "Overlaying a 2x2 identity matrix with 0, 0 offsets:" << std::endl;
