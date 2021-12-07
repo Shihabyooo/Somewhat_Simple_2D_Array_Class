@@ -155,6 +155,7 @@ bool Array2D::operator==(const Array2D arr2)
 				return false;
 		}
 	}
+	return true;
 }
 
 bool Array2D::operator!=(const Array2D arr2)
@@ -417,7 +418,7 @@ bool Array2D::AreJoinable(const Array2D & arr1, const Array2D & arr2, bool testH
 bool Array2D::AreNearlyEquall(const Array2D & arr1, const Array2D & arr2, float tolerance)
 {
 	tolerance = abs(tolerance); //in case it was sent as a negative value, in-which case all matrices would turn out to be equall.
-	if (arr1.Rows() != arr2.Rows() || arr1.Columns() != arr2.Columns())
+	if (!AreOfSameSize(arr1, arr2))
 		return false;
 
 	for (size_t i = 0; i < arr1.Rows(); i++)
