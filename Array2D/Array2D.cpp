@@ -142,6 +142,26 @@ void Array2D::operator=(std::vector<std::vector<double>>& sourceVec)
 	}
 }
 
+bool Array2D::operator==(const Array2D arr2)
+{
+	if (rows != arr2.Rows() || columns != arr2.Columns())
+		return false;
+
+	for (size_t i = 0; i < rows; i++)
+	{
+		for (size_t j = 0; j < columns; j++)
+		{
+			if (content[i][j] != arr2.GetValue(i, j))
+				return false;
+		}
+	}
+}
+
+bool Array2D::operator!=(const Array2D arr2)
+{
+	return !(*this == arr2);
+}
+
 void Array2D::operator/=(const Array2D & sourceArr)
 {
 	*this = InvertArray(sourceArr);
@@ -193,9 +213,16 @@ void Array2D::SetEntireArrayToFixedValue(double value)
 
 Array2D Array2D::GetSubMatrix(size_t beginRow, size_t noOfRows, size_t beginColumn, size_t noOfColumns)
 {
-	if (beginRow + noOfRows > rows || beginColumn + noOfColumns > columns)
+	
+	if (beginRow + noOfRows > rows || beginColumn + noOfColumns > columns)  //TODO consider rearranging the arguments for this method to have the pivot coord
+																			//first then lengths.
 	{
-		std::cout << "WARNING! Attempting to extract submatrix with a range outside the original matrix bounds" << std::endl;
+		std::cout << "ERROR! Attempting to extract submatrix with a range outside the original matrix bounds" << std::endl;
+		return Array2D();
+	}
+	if (noOfRows < 1 || noOfColumns < 1)
+	{
+		std::cout << "ERROR! Attempting to extract submatrix with null size in one both dimensions." << std::endl;
 		return Array2D();
 	}
 
@@ -272,6 +299,21 @@ Array2D ** Array2D::DecomposeLUP()
 	return DecomposeLUP(*this);
 }
 
+bool Array2D::NearlyEquals(const Array2D & arr, float tolerance)
+{
+	return Array2D::AreNearlyEquall(*this, arr, tolerance);
+}
+
+bool Array2D::IsSymmetric()
+{
+	return IsSymmetric(*this);
+}
+
+bool Array2D::IsSymmetric(float tolerance)
+{
+	return IsSymmetric(*this, tolerance);
+}
+
 Array2D Array2D::Identity(size_t dimension)
 {
 	Array2D uMatrix(dimension, dimension);
@@ -317,6 +359,42 @@ bool Array2D::IsInvertible(Array2D arr, bool checkSingular)
 		return true;
 }
 
+bool Array2D::IsSymmetric(const Array2D & arr)
+{
+	if (!IsSquared(arr))
+		return false;
+
+	for (size_t i = 0; i < arr.Rows(); i++)
+	{
+		for (size_t j = 0; j < arr.Rows(); j++)
+		{
+			if (arr.GetValue(i, j) != arr.GetValue(j, i))
+				return false;
+		}
+	}
+
+	return true;
+}
+
+bool Array2D::IsSymmetric(const Array2D & arr, float tolerance)
+{
+	if (!IsSquared(arr))
+		return false;
+	
+	tolerance = abs(tolerance); //in case it was sent as a negative value, in-which case all matrices would turn out to be symmetric.
+
+	for (size_t i = 0; i < arr.Rows(); i++)
+	{
+		for (size_t j = 0; j < arr.Rows(); j++)
+		{
+			if (abs(arr.GetValue(i, j) - arr.GetValue(j, i)) >= tolerance)
+				return false;
+		}
+	}
+
+	return true;
+}
+
 bool Array2D::AreJoinable(const Array2D & arr1, const Array2D & arr2, bool testHorizontally)
 {
 	if (testHorizontally) //testing for horizontal merging, row count must be equall.
@@ -334,6 +412,24 @@ bool Array2D::AreJoinable(const Array2D & arr1, const Array2D & arr2, bool testH
 		else
 			return false;
 	}
+}
+
+bool Array2D::AreNearlyEquall(const Array2D & arr1, const Array2D & arr2, float tolerance)
+{
+	tolerance = abs(tolerance); //in case it was sent as a negative value, in-which case all matrices would turn out to be equall.
+	if (arr1.Rows() != arr2.Rows() || arr1.Columns() != arr2.Columns())
+		return false;
+
+	for (size_t i = 0; i < arr1.Rows(); i++)
+	{
+		for (size_t j = 0; j < arr1.Rows(); j++)
+		{
+			if (abs(arr1.GetValue(i, j) - arr2.GetValue(i, j)) >= tolerance)
+				return false;
+		}
+	}
+
+	return true;
 }
 
 Array2D Array2D::MergeArrays(const Array2D & arr1, const Array2D & arr2)

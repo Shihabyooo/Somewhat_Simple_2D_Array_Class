@@ -79,13 +79,15 @@ public:
 	Array2D(std::vector<std::vector<double>> & sourceVec); //copy constructor from a vector of vectors of doubles, assumes unequal sub-vectors, allocates for largest one and pads the others with zeroes.
 	~Array2D();
 
-	//math overloads
+	//operator overloads
 	Array2D operator* (const Array2D & arr2);	//array multiplication overload (with another array)
 	Array2D operator* (const double & scalar);	//array multiplication overload (with scalar)
 	Array2D operator+ (const Array2D & arr2);	//array additions
 	Array2D operator- (const Array2D & arr2);	//arry substraction
 	void operator= (const Array2D & sourceArr);	//array assigment from similar type
 	void operator= (std::vector<std::vector<double>> & sourceVec);	//array assignment from a vector<vector<double>>, assumes unequal sub-vectors, allocates for largest one and pads the others with zeroes.
+	bool operator== (const Array2D arr2); //equality check
+	bool operator!= (const Array2D arr2); //non equality check (what?)
 	void operator/= (const Array2D & sourceArr);	//array inversion (assigns inverse of the RHS to LHS)
 													//TODO consider overloading the / operator to first invert the second array then multiply it with the first array.
 	double & operator() (const size_t _row, const size_t _column);	//Array like assignment and reading.
@@ -116,6 +118,9 @@ public:
 	void Overlay(const Array2D &arr2, size_t rowOffset, size_t columnOffset); //Add another Array2D of non-equal size to this Array2D element by element. If the second Array2D is larger, elements outside the boundary will be clipped. rowOffset and columnOffset determine which elements of the first Array2D the first element of the second Array2D will be added to.
 	Array2D ** DecomposeLU(); //For squared matrices only. Decomposes the matrix into upper and lower triangular matrices, returns as an array of two [pointers to] Array2Ds, the first being the lower decomposition, and the second the upper. Returns NULL if not decomposable.
 	Array2D ** DecomposeLUP(); //For squared matrices only. Decomposes the matrix into upper and lower triangular matrices with permuation, returns as an array of three [pointers to] Array2Ds, the first being the lower decomposition, and the second the upper, the third is the permuation matrix. Returns NULL if not decomposable.
+	bool NearlyEquals(const Array2D &arr, float tolerance);
+	bool IsSymmetric();
+	bool IsSymmetric(float tolerance);
 
 	//debugging aid
 	void DisplayArrayInCLI(int displayPrecision = 4);
@@ -125,8 +130,12 @@ public:
 	static bool AreOfSameSize(const Array2D &arr1, const Array2D &arr2);	//for m1*n1 and m2*n2 matrices, tests that m1 == m2 and n1 == n2.
 	static bool AreMultipliable(const Array2D &arr1, const Array2D &arr2);	//for m1*n1 and m2*n2 matrices, tests that n1 == m2.
 	static bool IsSquared(const Array2D &arr1); //For m*n matrix, tests that m = n.
+	//TODO modify IsInvertible to use const Array2D &arr. 
 	static bool IsInvertible(Array2D arr, bool checkSingular = false);	//Computing the determinant can take ages with current algorithm for large matrices, so the singularity check is optional.
+	static bool IsSymmetric(const Array2D &arr); //For squared matrices only. Returns false for non-squared matrices. Tests direct equality, dangerous due to comparison of doubles.
+	static bool IsSymmetric(const Array2D &arr, float tolerance); //For squared matrices only. Returns false for non-squared matrices. tolerance is the (absolute) allowed error in difference between counterpart values, bellow which they are considered equal.
 	static bool AreJoinable(const Array2D &arr1, const Array2D &arr2, bool testHorizontally = true);	//tests m1 == m2 or n1 == n2 depending on testHorizontally.
+	static bool AreNearlyEquall(const Array2D &arr1, const Array2D &arr2, float tolerance);
 	static Array2D MergeArrays(const Array2D &arr1, const Array2D &arr2);	//Stitches two arrays horizontally, both arrays must be of equal row count.
 	static Array2D ** DecomposeLU(const Array2D &arr);  //For squared matrices only. Decomposes the matrix into upper and lower triangular matrices, returns as an array of two [pointers to] Array2Ds, the first being the lower decomposition, and the second the upper. Returns NULL if not decomposable. Deleting memory is responcibility of caller.
 	static Array2D ** DecomposeLUP(const Array2D &arr); //For squared matrices only. Decomposes the matrix into upper and lower triangular matrices with permuation, returns as an array of three [pointers to] Array2Ds, the first being the lower decomposition, and the second the upper, the third is the permuation matrix. Returns NULL if not decomposable. Deleting memory is responcibility of caller.
